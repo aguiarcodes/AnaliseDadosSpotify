@@ -1,32 +1,30 @@
-#Aula 1
-#Exercício 1- Carregar os pacotes necessários para a realização dos exercícios
+#Carregar os pacotes necessários para a realização dos exercícios
 install.packages("tidyverse")
 install.packages("gt")
 
 library(tidyverse)
 library(gt)
 
-#Exercício 2- Carregar os arquivos spot1.csv e spot2.csv
+#Carregar os arquivos spot1.csv e spot2.csv
 setwd("C:/Users/Larissa/OneDrive/Área de Trabalho/trabalho R")
 
 spot1 <- read.csv("spot1.csv")
 spot2 <- read.csv("spot2.csv")
 
-#Aula 2
-#Exercício 1- Gerar as estatísticas resumo dos arquivos spot1 e spot2
-# estatísticas resumo de spot1
+#Gerar as estatísticas resumo dos arquivos spot1 e spot2
+#estatísticas resumo de spot1
 summary(spot1)
 
-# estatísticas resumo de spot2
+#estatísticas resumo de spot2
 summary(spot2)
 
-# carregando pacote dplyr
+#carregando pacote dplyr
 library(dplyr)
 
-# Exercício 2- Filtrar apenas as músicas a partir do ano 1950
+#Filtrar apenas as músicas a partir do ano 1950
 spot1_filtered <- filter(spot1, year >= 1950)
 
-# Exercício 3- Criar uma variável nova classificando a data de lançamento das músicas a cada 20 anos
+#Criar uma variável nova classificando a data de lançamento das músicas a cada 20 anos
 spot1$year2 <- ifelse(spot1$year >= 1950 & spot1$year <= 1969, "1950-1969",
                       ifelse(spot1$year >= 1970 & spot1$year <= 1989, "1970-1989",
                              ifelse(spot1$year >= 1990 & spot1$year <= 2009, "1990-2009",
@@ -35,64 +33,62 @@ spot1$year2 <- ifelse(spot1$year >= 1950 & spot1$year <= 1969, "1950-1969",
 
 head(spot1)
 
-#Aula 3
-#Exercício 1-Juntar as duas tabelas spot1 e spot2
+#Juntar as duas tabelas spot1 e spot2
 spotj <- left_join(spot1, spot2, by = "id")
 
 head(spotj)
 
-#Exercício 2-Criar uma nova tabela selecionando apenas as músicas explícitas
+#Criar uma nova tabela selecionando apenas as músicas explícitas
 spotexp <- filter(spotj, explicit == TRUE)
 
 head(spotexp)
 
-#Exercício 3-Criar uma nova tabela adicionando apenas os gêneros musicais: Alternative, Country, Dance, Folk, Pop, Rock
+#Criar uma nova tabela adicionando apenas os gêneros musicais: Alternative, Country, Dance, Folk, Pop, Rock
 spotj <- filter(spotj, genre %in% c("Alternative", "Country", "Dance", "Folk", "Pop", "Rock"))
 
 head(spotj)
 
-#Exercício 4-Recodificar a categoria Dance, da variável genre, para Pop
-# carregando o pacote forcats
+#Recodificar a categoria Dance, da variável genre, para Pop
+#carregando o pacote forcats
 library(forcats)
 
-# recodificando a categoria
+#recodificando a categoria
 spotj$genre <- fct_recode(spotj$genre, "Pop" = "Dance")
 
 head(spotj)
 
-#Aula 4
-#Exercício 1- Criar uma tabela de frequência por gênero musical
+#Criar uma tabela de frequência por gênero musical
 freq_by_genre <- spotj %>%
   group_by(genre) %>%
   summarize(count = n())
 
 print(freq_by_genre)
 
-#Exercício 2- Adicionar à tabela acima a média de danceability por gênero musical
+#Adicionar à tabela acima a média de danceability por gênero musical
 freq_by_genre <- spotj %>%
   group_by(genre) %>%
   summarize(count = n(), mean_danceability = mean(danceability, na.rm = TRUE))
 
 print(freq_by_genre)
 
-#Exercício 3-Adicionar à tabela acima a proporção por gênero musical
+#Adicionar à tabela acima a proporção por gênero musical
 total_count <- sum(freq_by_genre$count)
 freq_by_genre <- freq_by_genre %>%
   mutate(proportion = count / total_count)
 
 print(freq_by_genre)
 
-#Exercício 4-Criar uma tabela cruzada de gênero x década de lançamento
+#Criar uma tabela cruzada de gênero x década de lançamento
 #carregando o pacote janitor
 install.packages("janitor")
 library(janitor)
 
-# tabela cruzada de gênero x década de lançamento
+#tabela cruzada de gênero x década de lançamento
 cross_table <- tabyl(spotj, genre, year2)
 
 print(cross_table)
 
-#Exercício 5-Utilizar o pacote gt para apresentar as duas tabelas acima
+#Utilizar o pacote gt para apresentar as duas tabelas acima
 #tabela de frequência por gênero musical
 gt_freq_by_genre <- freq_by_genre %>%
   gt() %>%
@@ -126,15 +122,14 @@ gt_cross_table <- cross_table %>%
 
 print(gt_cross_table)
 
-#Aula 5
-#Exercício 1- Criar um gráfico de pontos da “dançabilidade” x popularidade das músicas do gênero Rock.
-# carregando o pacote ggplot2
+#Criar um gráfico de pontos da “dançabilidade” x popularidade das músicas do gênero Rock.
+#carregando o pacote ggplot2
 library(ggplot2)
 
-# filtrando o gênero rock
+#filtrando o gênero rock
 rock_songs <- filter(spotj, genre == "Rock")
 
-# criando o gráfico de pontos
+#criando o gráfico de pontos
 ggplot(rock_songs, aes(x = danceability, y = popularity)) +
   geom_point() +
   labs(
@@ -144,7 +139,7 @@ ggplot(rock_songs, aes(x = danceability, y = popularity)) +
   ) +
   theme_light()
 
-#Exercício 2- Criar um gráfico de barras simples mostrando a média de popularidade por gênero
+#Criar um gráfico de barras simples mostrando a média de popularidade por gênero
 ggplot(spotj, aes(x = genre, y = popularity)) +
   geom_bar(stat = "summary", fun = "mean") +
   labs(
@@ -154,7 +149,7 @@ ggplot(spotj, aes(x = genre, y = popularity)) +
   ) +
   theme_light()
 
-#Exercício 3-Criar um gráfico de barras empilhado cruzando a proporção de músicas por gênero e o período de lançamento da música
+#Criar um gráfico de barras empilhado cruzando a proporção de músicas por gênero e o período de lançamento da música
 ggplot(spotj, aes(x = year2, fill = genre)) +
   geom_bar(position = "fill") +
   labs(
@@ -164,6 +159,3 @@ ggplot(spotj, aes(x = year2, fill = genre)) +
     fill = "Gênero"
   ) +
   theme_classic()
-
-
-
